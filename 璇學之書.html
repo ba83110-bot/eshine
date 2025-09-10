@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>璇學之書</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            font-family: "SimSun", "STSong", serif;
+        }
+        
+        .container {
+            width: 380px;
+            height: 700px;
+            background-color: #000;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .background {
+            width: 100%;
+            height: 100%;
+            /* 更换为指定的背景图片 */
+            background-image: url('https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/f10e48e745fc4e82b743381d20bd311a.jpg~tplv-a9rns2rl98-24:720:720.image?rk3s=1fb89129&x-expires=1758108377&x-signature=TqeeuVo2CeZIRGK9CYjW4E8XSSU%3D');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.8;
+        }
+        
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.7));
+        }
+        
+        #answer {
+            position: absolute;
+            top: 44px;
+            left: 40px;
+            width: 300px;
+            color: #F9DBB3;
+            font-size: 40px;
+            line-height: 65px;
+            font-weight: bold;
+            text-align: center;
+            display: none;
+            white-space: pre-line;
+            word-wrap: break-word;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        #explanation {
+            position: absolute;
+            top: 240px;
+            left: 48px;
+            width: 284px;
+            color: #FFFFFF;
+            font-size: 16px;
+            line-height: 26px;
+            text-align: center;
+            display: none;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+        }
+        
+        #question {
+            position: absolute;
+            top: 180px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #F9DBB3;
+            font-size: 32px;
+            font-weight: bold;
+            text-align: center;
+            width: 80%;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        #generateButton {
+            position: absolute;
+            bottom: 96px;
+            left: 50%;
+            width: auto;
+            padding: 8px 16px;
+            background-color: #1C1C1C;
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            transition: all 0.2s ease;
+            transform: translateX(-50%);
+        }
+        
+        #generateButton:hover {
+            background-color: #333333;
+            transform: translateX(-50%) scale(1.05);
+        }
+        
+        .decorative-arc {
+            position: absolute;
+            top: 200px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            height: 150px;
+            border: 1px solid rgba(249, 219, 179, 0.5);
+            border-bottom: none;
+            border-radius: 150px 150px 0 0;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="background"></div>
+        <div class="overlay"></div>
+        <div id="question">璇學之書</div>
+        <div id="answer"></div>
+        <div class="decorative-arc"></div>
+        <button id="generateButton">默唸問題，尋找答案</button>
+    </div>
+
+    <script>
+        // 答案数据
+        const answers = [
+            "向世界說always on the way",
+            "就追著風路再長也無畏",
+            "美好的我沒理由枯萎",
+            "我想我依然愛著用力愛著還是我",
+            "再一次揮手朝著更遠處大步往前走",
+            "時間替我做的夢遠比想象多",
+            "別害怕此刻脆弱",
+            "別怕那麽痛",
+            "我還是我只是勇敢推倒其中一個",
+            "學會慷慨接受不完美的裂縫",
+            "我會是我永遠都會愛上自己的我",
+            "短暫告別之後重新再往前走",
+            "從頭來過約定好明天再次相逢",
+            "遺憾過什麽留下了記憶還剩下什麽",
+            "我們邊走邊回頭輕聲問候直到有一天忘了",
+            "日子照樣過不過是一段成長渺小陣痛",
+            "好天氣依然大方眷顧我說明天之後一切會好的",
+            "不完美的大人啊別害怕時間都會過去的",
+            "也許最初的終點沒到達 或許又晚點來了那也不錯",
+            "那些曾沒能相認的回答 會長成最完美的新生後的童話",
+            "為什麽長大一定失去什麽",
+            "變成厲害的我邊走邊丟",
+            "為何大人不舍從來不敢開口",
+            "為什麽隱藏明知再難擁有",
+            "說放手也是一種收獲",
+            "With you享受這場未命名關係",
+            "Somebody stole my heart ",
+            "As long as I’m still with you ",
+            "可是我總想再催眠自己",
+            "And let you go",
+            "I am afraid to even blink",
+            "But they ache to devour you whole",
+            "and i want you right here",
+            "It’s a Guilty pleasure loving you",
+            "Let me make the mistake of loving you",
+            "因為你 我也相信被期待的力量",
+            "我也想試一試去勇敢",
+            "那麽就 約定了一起走 誰也不要回頭",
+            "星星攢成煙火 永遠為我閃爍",
+            "別哭 別怕輸",
+            "天暗了還有你在為我領路",
+            "你也在痛吧 卻還在叫我別害怕",
+            "給我肩膀 借我勇敢",
+            "我擁有的星空時明時暗 你從未放開",
+            "始終堅持 為我點燃",
+            "我有在像你希望的那樣子成長嗎",
+            "還是這一路上你也滿懷揣著失望",
+            "還在笨拙跌跌撞撞",
+            "所有我的傷痛你是否也在同樣感受啊",
+            "我永遠不怕重來",
+            "你也在痛吧 卻還在叫我別害怕",
+            "給我肩膀 借我勇敢",
+            "行李箱攤開一地 走吧去旅行",
+            "風兒那麽輕 陽光透明無需猜人心",
+            "請閉上眼睛跟我說你想去哪里",
+            "我們漂浮雲端里 我們遊蕩在風里",
+            "我們拋下柴米油鹽和煩心 我們去旅行",
+            "我們逃離這里",
+            "睡吧別害怕沒關系 我們在一起",
+            "燃燒吧我需要這刻的光影",
+            "第一萬次我還是要奔向你",
+            "我們一起追尋",
+            "我好像也不是什麽了不起的大人",
+            "是看到你才相信，我好像也偉大這件事情",
+            "世界很堅定",
+            "我會做一個世界最了不起的大人",
+            "人生啊不就是迎難而上",
+            "是晴是雨都別阻止我享受早晨",
+            "什麽已經黃昏那就欣賞星辰",
+            "反正無聊也一如既往",
+            "人生啊總得要如願以償",
+            "準備肚皮痛快吃一場",
+            "這世道本就適者生存",
+            "不如擼袖做自己超人",
+            "別在圈套里束手被困",
+            "來吧管他什麽牛鬼蛇神",
+            "不如痛快去暢享青春",
+            "這一次我們再奮不顧身",
+            "一起羨煞旁人",
+            "也有人在重蹈我們過去的事情",
+            "慌張逃離 消失在天際",
+            "謊是怎麽動聽 怎麽噬入人心",
+            "我數著淹沒在海里 迷路的水滴",
+            "和看著人們揣測我們當時的用意",
+            "慌張逃離 還似不經意",
+            "聽不到回應 忘了來時目的",
+            "吞掉我欲望最後一根的神經",
+            "我也忘了為何 泣鳴",
+            "聽說你來時的路上 花都要開了",
+            "就請你再 陪我等等吧",
+            "想到我的時候,心里還會空出一塊嗎",
+            "我不要最後 變成你不願啟齒",
+            "我們最後好好告別了嗎",
+            "那個畫面足夠美到我們一生記住她嗎",
+            "下個蟬鳴夜 請給我回答",
+            "我們最後還是會走散嗎",
+            "要記得我身上落滿陽光的樣子啊",
+            "無論驕陽 還是晚霞",
+            "是你曾為我編織的繁華",
+            "身邊為我留出一個位置可不可以",
+            "我知道你想要的一切 我都會給你",
+            "世界有太多美好在排隊等著我和你",
+            "Baby你不要著急",
+            "可不可以",
+            "怎麽可以",
+            "這一刻還是不懂我的心情",
+            "怎麽能不吃這套",
+            "真是要命",
+            "記住你想要的一切 我會努力給你",
+            "怎麽還是都只差一點點",
+            "好奇你的心情",
+            "這一次是否都實現",
+            "忽然這一瞬間我們是否還有勇氣",
+            "還是想靠近 還是想大聲說我可以",
+            "你是否相信",
+            "好像也曾在哪里遇見",
+            "好像此刻不再需要邊界",
+            "你說今天又是平凡的一天",
+            "任我們一起虛度時間",
+            "你是否也曾一樣 拼了命去努力抵抗",
+            "對未來充滿了遐想",
+            "還想再一次瘋狂",
+            "星星在月亮底下拼命發光",
+            "都已經啟程又怎甘只跑半場",
+            "我想在雲巔翺翔",
+            "其實想告訴你 你和月亮 都很迷人",
+            "不用逼自己睡著",
+            "不要計劃著逃跑",
+            "不去計較黑白顛倒",
+            "怎麽這個毛病 我總是改不掉",
+            "是不是說我痛就能夠一起哭",
+            "是不是說留下就可以不孤獨",
+            "是不是承認想念就可以和我相擁",
+            "是在等我說出口 還是希望我沈默",
+            "見面不需要預告",
+            "心動也等不及訊號",
+            "想睡著就來一顆安眠藥",
+            "醒來再面對那些糟糕",
+            "我只要你點頭 我帶你逃出這宇宙",
+            "我有多愛你 天知道",
+            "別再等明天了 現在就盡情失控",
+            "What about us",
+            "世界很好 世界很糟",
+            "我們相愛就好",
+            "就讓我飛吧 飛啊",
+            "就讓我借著那風 翺翔在雲巔之上",
+            "就算看透一切也別輕易看輕夢想",
+            "活在這世上至少也需要那麽一點信仰",
+            "為何迷茫 是不知通往何處的欲望",
+            "你能清楚看到 我那勇敢 的形狀",
+            "奔向那懸崖 別怕",
+            "實現它吧 擁抱它吧",
+            "一切盡在掌握中",
+            "太不錯了",
+            "該我的會是我的",
+            "在預料中",
+            "感情世界裡哪裡有輸贏",
+            "算了 別說了",
+            "完蛋了 假戲真做了",
+            "這個世界還是需要競爭",
+            "其實可能沒這麼複雜",
+            "看現在就好",
+            "不許去看",
+            "沒必要欺騙自己",
+            "首先要顧及自己",
+            "人生還是要自己創造的",
+            "愛是全部意義",
+            "未來好像是還有路繼續往前走",
+            "會有回報的",
+            "現在脆弱一點點也沒有關係喔",
+            "有點不可置信",
+            "放心",
+            "保護好自己的情緒最重要",
+            "惜命!",
+            "保持希望",
+            "珍惜當下 期待以後",
+            "不要小心翼翼 也不要戰戰兢兢",
+            "累是累了點 但是享受過程",
+            "享受吧 會快樂",
+            "就事論事嗎",
+            "別擔心",
+            "我們討厭壞人就好了",
+            "人的慾望真的好可怕",
+            "有點太愛了",
+            "有點叛逆",
+            "別多想了",
+            "封心鎖愛",
+            "也沒那麼愛嗎",
+            "看來還是挺愛的嗎",
+            "每個人理解不一樣",
+            "大家都快樂就好",
+            "再說吧",
+            "沒必要欺騙自己",
+            "孩子給自己尋個安心",
+            "何錯之有",
+            "死心吧",
+            "即刻感受比較重要",
+            "是一種平淡的美好",
+            "運氣來了擋也擋不住",
+            "要開心喔",
+            "愛這種東西不能拿被交換的",
+            "名正言順",
+            "互相理解最重要",
+            "別內耗自己",
+            "是這個世界的損失",
+            "回去就睡覺",
+            "不會這麼殘忍的",
+            "和自己相處永遠最重要",
+            "期望太高 就會失望",
+            "稍作休息",
+            "同甘共苦",
+            "有問題解決問題  才是相處關鍵",
+            "是不是需要克制一下",
+            "大家都一樣",
+            "無事發生",
+            "為金錢所動 不為金錢所全動",
+            "小段不懂",
+            "我勒个豆",
+            "愛自己 在意自己吧",
+            "我的感受 也全世界第一重要",
+            "啵啵"
+        ];
+
+        // 获取DOM元素
+        const generateButton = document.getElementById('generateButton');
+        const answerElement = document.getElementById('answer');
+        const explanationElement = document.getElementById('explanation');
+        const questionElement = document.getElementById('question');
+        const decorativeArc = document.querySelector('.decorative-arc');
+
+        // 点击事件处理
+        generateButton.addEventListener('click', function() {
+            // 生成随机索引
+            const randomIndex = Math.floor(Math.random() * answers.length);
+            let selectedAnswer = answers[randomIndex];
+            
+            // 处理答案分行显示
+            let line1 = selectedAnswer.substring(0, 10);
+            let line2 = selectedAnswer.substring(10, 20);
+            let displayAnswer = line1;
+            if (line2) {
+                displayAnswer += '\n' + line2;
+            }
+            
+            // 隐藏问题，显示答案和解释
+            questionElement.style.display = 'none';
+            answerElement.textContent = displayAnswer;
+            answerElement.style.display = 'block';
+            if (explanationElement) {
+                explanationElement.style.display = 'block';
+            }
+            decorativeArc.style.display = 'block';
+            
+            // 改变按钮文本
+            generateButton.textContent ='啵啵';
+        });
+    </script>
+</body>
+</html>
